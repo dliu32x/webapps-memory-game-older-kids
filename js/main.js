@@ -477,6 +477,12 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
 
         createSoundElement(SOUND_STARTGAME);
         
+        $(window).on('tizenhwkey', function (e) {
+            if (e.originalEvent.keyName === "back") {
+                tizen.application.getCurrentApplication().exit();
+            }
+        });
+
         // Add the event handler functions.
         $("#main_page").click(function () {
             // Hide mainview and show level selection.
