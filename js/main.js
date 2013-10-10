@@ -488,12 +488,12 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         });
 
         // Add the event handler functions.
-        $("#main_page").click(function () {
+        $("#main_page").bind('touchstart', function () {
             // Hide mainview and show level selection.
             introViewSkipCallback();
         });
         
-        $("#selLevel_levelCard1").click(function () {
+        $("#selLevel_levelCard1").bind('touchstart', function () {
             // Start game.
             levelSelectionUserChoice = 1;
             playSound(SOUND_FLIPCARD);
@@ -503,7 +503,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
             $("#selLevel_levelCard4").addClass("selLevel_anim1");
             window.setTimeout("Game.levelSelectionAnimCallback()", 1000);
         });
-        $("#selLevel_levelCard2").click(function() {
+        $("#selLevel_levelCard2").bind('touchstart', function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
                 playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 2;
@@ -514,7 +514,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
                 window.setTimeout("Game.levelSelectionAnimCallback()", 1000);
             }
         });
-        $("#selLevel_levelCard3").click(function() {
+        $("#selLevel_levelCard3").bind('touchstart', function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
                 playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 3;
@@ -525,7 +525,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
                 window.setTimeout("Game.levelSelectionAnimCallback()", 1000);
             }
         });
-        $("#selLevel_levelCard4").click(function() {
+        $("#selLevel_levelCard4").bind('touchstart', function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
                 playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 4;
@@ -537,8 +537,8 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
             }
         });
         
-        $(".card").click(function() {
-            console.log("--> card.click()");
+        $(".card").bind('touchstart', function() {
+            console.log("--> card.touchstart()");
             if (!ignoreInputs && !($(this).hasClass(SHOWCARD_STYLE))) {
                 playSound(SOUND_FLIPCARD);
                 clickedCardElement = $(this);
@@ -547,25 +547,25 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
                 $(this).addClass(SHOWCARD_STYLE);
                 window.setTimeout("Game.flipCallback()", 350);
             }
-            console.log("<-- card.click()");
+            console.log("<-- card.touchstart()");
         });
         
-        $("#finaleIntro").click( function() {
+        $("#finaleIntro").bind('touchstart', function() {
             // Start playing final level.
             $("#finaleIntro").hide();
             startGame(4, false);
         });
         
-        $("#victory_playagain_box").click(function() {
-            console.log("--> victory_playagain_box.click()");
+        $("#victory_playagain_box").bind('touchstart', function() {
+            console.log("--> victory_playagain_box.touchstart()");
             prepareSelectLevelScreen();
             $("#victory").hide();
             $("#selLevel_page").show();
-            console.log("<-- victory_playagain_box.click()");
+            console.log("<-- victory_playagain_box.touchstart()");
         });
         
-        $("#homebutton_backtomain").click(function() {
-            console.log("--> homebutton.click()");
+        $("#homebutton_backtomain").bind('touchstart', function() {
+            console.log("--> homebutton.touchstart()");
             // Hide current levels and show mainpage.
             $("#level1").hide();
             $("#level2").hide();
@@ -574,10 +574,10 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
             $("#handitem").hide();
             $("#main_page").show();
             $(this).hide();
-            console.log("<-- homebutton.click()");
+            console.log("<-- homebutton.touchstart()");
         });
         
-        $("#selLevel_resetLocked").click(function() {
+        $("#selLevel_resetLocked").bind('touchstart', function() {
             localStorage.setItem(LOCAL_STORAGE_KEY, '0000');
             prepareSelectLevelScreen();
         });
