@@ -16,12 +16,7 @@
     cursor: pointer;
     -webkit-border-radius: 20px;
     border: solid 1px #000000;
-    opacity: 0.3;
     color: black;
-}
-
-#licensebtnl:hover {
-    opacity: 1.0;
 }
 
 #licensepage {
@@ -50,8 +45,10 @@
     text-align: center;
 }
 
-.licensebtn {
+#licensebtnq {
     position: absolute;
+    left: 412px;
+    width: 200px;
     color: #d7d7d7;
     border: solid 1px #333;
     text-align: center;
@@ -65,18 +62,4 @@
     line-height: 48px;
     cursor: pointer;
     box-shadow: 2px 2px 14px #000;
-}
-
-.licensebtn:hover {
-    background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000));
-}
-
-.licensebtn:active {
-    color: #666;
-    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
-}
-
-#licensebtnq {
-    left: 412px;
-    width: 200px;
 }

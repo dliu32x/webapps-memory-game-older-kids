@@ -475,7 +475,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
             $("#main_page").hide();
             $("#selLevel_page").show();
         }
-        license_init("license", "pagebg");
+        license_init("license");
         help_init("main_help", "help_");
         createSoundElement(SOUND_FLIPCARD1);
         createSoundElement(SOUND_FLIPCARD2);

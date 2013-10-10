@@ -7,14 +7,10 @@
  *
  */
 
-function license_init(id, hpageid)
+function license_init(id)
 {
-    var lbtn = document.getElementById(id+"btnl");
-    var qbtn = document.getElementById(id+"btnq");
-    var lpage = document.getElementById(id+"page");
-    var hpage = document.getElementById(hpageid);
-    var ltext = document.getElementById(id+"text");
-    var lscroll = document.getElementById(id+"scroll");
+    var ltext = $('#'+id+'text');
+    var lscroll = $('#'+id+'scroll');
     var timer;
 
     var request = new XMLHttpRequest();
@@ -36,25 +32,25 @@ function license_init(id, hpageid)
                 lines[i] += "<br>";
             }
         }
-        lscroll.innerHTML = lines.join("\n");
+        lscroll.html(lines.join("\n"));
     }
     request.send();
 
-    lbtn.onclick = function() {
+    $('#'+id+'btnl').bind('touchstart', function() {
         /* initialize scroll rate */
         var dY = 2;
         var t0 = 0;
         var delay = 1000;
 
         /* set the scroller to the top position */
-        lscroll.style.top = "0px";
+        lscroll.css("top", "0px");
 
         /* display the license page, hide its parent */
-        hpage.style.display="none";
-        lpage.style.display="block";
+        $('#main_page').hide();
+        $('#'+id+'page').show();
 
         /* calculate the scroll length when the window is shown */
-        var maxY = lscroll.clientHeight - ltext.clientHeight;
+        var maxY = lscroll.height() - ltext.height();
 
         /* start the autoscroll interval */
         timer = setInterval(function() {
@@ -69,11 +65,11 @@ function license_init(id, hpageid)
                 return;
 
             /* calculate the new top position using dY and dT */
-            var newY = Math.abs(parseInt(lscroll.style.top)) + ((dT/40)*dY);
+            var newY = Math.abs(parseInt(lscroll.css("top"))) + ((dT/40)*dY);
             if(newY > 0)
-                lscroll.style.top = (-1 * newY) + "px";
+                lscroll.css("top", -1 * newY + "px");
             else
-                lscroll.style.top = "0px";
+                lscroll.css("top", "0px");
 
             /* if the lscroll has hit the limit, delay and swing */
             /* the other way */
@@ -88,12 +84,12 @@ function license_init(id, hpageid)
                 dY = 2;
             }
         }, 40);
-    };
+    });
 
-    qbtn.onclick = function() {
-        hpage.style.display="block";
-        lpage.style.display="none";
+    $('#'+id+'btnq').bind('touchstart', function() {
+        $("#main_page").show();
+        $('#'+id+'page').hide();
         clearInterval(timer);
-    };
+    });
 }
 
