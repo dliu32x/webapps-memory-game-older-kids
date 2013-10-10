@@ -53,8 +53,7 @@ var stariconsList = [
 ];
 
 var audioItems = [
-    "flipcard_sound1",
-    "flipcard_sound2",
+    "flipcard_sound",
     "startGame_sound",
     "finaleIntro_sound",
     "winLevel_sound",
@@ -63,19 +62,17 @@ var audioItems = [
 
 var audioSrc = [
     "audio/FlipCard.wav",
-    "audio/FlipCard.wav",
     "audio/StartPage.wav",
     "audio/TheFinale.wav",
     "audio/WinLevel.wav",
     "audio/YouWin.wav"
 ];
 
-var SOUND_FLIPCARD1 = 0;
-var SOUND_FLIPCARD2 = 1;
-var SOUND_STARTGAME = 2;
-var SOUND_FINALEINTRO = 3;
-var SOUND_LEVEL_WON = 4;
-var SOUND_VICTORY = 5;
+var SOUND_FLIPCARD = 0;
+var SOUND_STARTGAME = 1;
+var SOUND_FINALEINTRO = 2;
+var SOUND_LEVEL_WON = 3;
+var SOUND_VICTORY = 4;
 
 
 var LOCKED_LEVELCARD_STYLE = "setLevel_lockedLevel";
@@ -92,7 +89,6 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
     var clickedCardElement = undefined;
     var levelNumber = -1;
     var passedGames = 0;
-    var lastPlayedFlipSound = SOUND_FLIPCARD2;
     var levelLockingStatus = [ false, true, true, true ];
     
     // Set memberfunctions.
@@ -109,12 +105,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         var audioElement = document.createElement('audio');
         audioElement.setAttribute("id", audioItems[soundId]);
         audioElement.setAttribute("src", audioSrc[soundId]);
-        if (soundId == SOUND_STARTGAME) {
-            audioElement.setAttribute("preload", "auto");
-            audioElement.setAttribute("autoplay", "autoplay");
-        } else {
-            audioElement.setAttribute("preload", "none");
-        }
+        audioElement.setAttribute("preload", "auto");
         document.body.appendChild(audioElement);
     }
 
@@ -124,6 +115,8 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
     function playSound(soundId) {
         var audioElement = document.getElementById(audioItems[soundId]);
         audioElement.pause();
+        if (audioElement.currentTime > 0)
+	    audioElement.currentTime = 0;
         audioElement.play();
     }
     
@@ -323,7 +316,6 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
             saveStatus();
             // Currently finished level was 4. It means that player has finished the game.
             prepareVictoryScreen();
-            createSoundElement(SOUND_VICTORY);
             playSound(SOUND_VICTORY);
             $("#level4").hide();
             $("#victory").show();
@@ -345,7 +337,6 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         if (levelOfNextGame == 4) {
             // Show intro view before entring the final level.
             levelLockingStatus[3] = false;
-            createSoundElement(SOUND_FINALEINTRO);
             playSound(SOUND_FINALEINTRO);
             $("#homebutton_backtomain").hide();
             $("#handitem").hide();
@@ -477,9 +468,10 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         }
         license_init("license");
         help_init("main_help", "help_");
-        createSoundElement(SOUND_FLIPCARD1);
-        createSoundElement(SOUND_FLIPCARD2);
+        createSoundElement(SOUND_FLIPCARD);
+        createSoundElement(SOUND_FINALEINTRO);
         createSoundElement(SOUND_LEVEL_WON);
+        createSoundElement(SOUND_VICTORY);
     }
     
     // Initialize game once everything has been loaded.
@@ -487,6 +479,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         console.log("--> document.ready()");
 
         createSoundElement(SOUND_STARTGAME);
+        playSound(SOUND_STARTGAME);
         
         $(window).on('tizenhwkey', function (e) {
             if (e.originalEvent.keyName === "back") {
@@ -503,7 +496,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         $("#selLevel_levelCard1").click(function () {
             // Start game.
             levelSelectionUserChoice = 1;
-            playSound(SOUND_FLIPCARD2);
+            playSound(SOUND_FLIPCARD);
             $("#selLevel_levelCard1").addClass("selLevel_selectedCard");
             $("#selLevel_levelCard2").addClass("selLevel_anim1");
             $("#selLevel_levelCard3").addClass("selLevel_anim1");
@@ -512,7 +505,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         });
         $("#selLevel_levelCard2").click(function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
-                playSound(SOUND_FLIPCARD2);
+                playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 2;
                 $("#selLevel_levelCard2").addClass("selLevel_selectedCard");
                 $("#selLevel_levelCard1").addClass("selLevel_anim2");
@@ -523,7 +516,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         });
         $("#selLevel_levelCard3").click(function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
-                playSound(SOUND_FLIPCARD2);
+                playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 3;
                 $("#selLevel_levelCard3").addClass("selLevel_selectedCard");
                 $("#selLevel_levelCard1").addClass("selLevel_anim3");
@@ -534,7 +527,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         });
         $("#selLevel_levelCard4").click(function() {
             if ($(this).hasClass(LOCKED_LEVELCARD_STYLE) == false) {
-                playSound(SOUND_FLIPCARD2);
+                playSound(SOUND_FLIPCARD);
                 levelSelectionUserChoice = 4;
                 $("#selLevel_levelCard4").addClass("selLevel_selectedCard");
                 $("#selLevel_levelCard1").addClass("selLevel_anim4");
@@ -547,15 +540,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         $(".card").click(function() {
             console.log("--> card.click()");
             if (!ignoreInputs && !($(this).hasClass(SHOWCARD_STYLE))) {
-                // We have to use 2 different audio items for flip sound because
-                // audio API doesn't replay the sound if it is already playing.
-                if (lastPlayedFlipSound == SOUND_FLIPCARD1) {
-                    lastPlayedFlipSound = SOUND_FLIPCARD2;
-                } else {
-                    lastPlayedFlipSound = SOUND_FLIPCARD1;
-                }
-                createSoundElement(SOUND_FLIPCARD1);
-                playSound(lastPlayedFlipSound);
+                playSound(SOUND_FLIPCARD);
                 clickedCardElement = $(this);
                 ignoreInputs = true;
                 console.log("    card id: " + $(this).attr("id"));
