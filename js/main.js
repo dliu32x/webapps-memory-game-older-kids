@@ -458,6 +458,17 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         console.log("<-- startGame()");
     }
 
+    function help_init()
+    {
+        $('#main_help').bind('touchstart', function() {
+            $('#help_dialog').removeClass('helpdialog').addClass('helpdialog shown');
+        });
+
+        $('#help_close').bind('touchstart', function() {
+            $('#help_dialog').removeClass('helpdialog shown').addClass('helpdialog');
+        });
+    }
+
     function introViewSkipCallback() {
         prepareSelectLevelScreen();
         if ($("#main_page").is(":visible")) {
