@@ -7,44 +7,7 @@
  *
  */
 
-Card = function() {
-    this.cardId = "";
-    this.cardFrontId = "";
-    this.cardGraphics = "";
-    this.cardType = -1;
-    this.found = false;
-}
-
 Game = {};
-
-var normalCardImages = [
-    "images/noglow_balloon.png",
-    "images/noglow_butterflies.png",
-    "images/noglow_crown.png",
-    "images/noglow_cup.png",
-    "images/noglow_elephant.png",
-    "images/noglow_guitar.png",
-    "images/noglow_horn.png",
-    "images/noglow_lion.png",
-    "images/noglow_moon.png",
-    "images/noglow_sun.png",
-    "images/noglow_zebra.png",
-    "images/noglow_blank.png"
-];
-var glowingCardImages = [
-    "images/card_flip_balloon.png",
-    "images/card_flip_butterflies.png",
-    "images/card_flip_crown.png",
-    "images/card_flip_cup.png",
-    "images/card_flip_elephant.png",
-    "images/card_flip_guitar.png",
-    "images/card_flip_horn.png",
-    "images/card_flip_lion.png",
-    "images/card_flip_moon.png",
-    "images/card_flip_sun.png",
-    "images/card_flip_zebra.png",
-    "images/card_flip_blank.png"
-];
 
 var stariconsList = [
     "images/purple_star.png",
@@ -76,7 +39,6 @@ var SOUND_VICTORY = 4;
 
 
 var LOCKED_LEVELCARD_STYLE = "setLevel_lockedLevel";
-var SHOWCARD_STYLE = "flip_to_visible";
 var GAMES_PER_LEVEL = 3;
 var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
 
@@ -85,8 +47,7 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
     var cardsArray = new Array();
     var levelSelectionUserChoice = -1;
     var ignoreInputs = false;
-    var firstFlippedCard = undefined;
-    var clickedCardElement = undefined;
+    var matchcard = undefined;
     var levelNumber = -1;
     var passedGames = 0;
     var levelLockingStatus = [ false, true, true, true ];
@@ -119,7 +80,22 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
 	    audioElement.currentTime = 0;
         audioElement.play();
     }
-    
+
+    var gamedata = [
+        {
+            cardcount : 12
+        },
+        {
+            cardcount : 18
+        },
+        {
+            cardcount : 24
+        },
+        {
+            cardcount : 24
+        }
+    ];
+
     /**
      * This function prepares the graphical elements of Victory-screen.
      */
@@ -181,51 +157,15 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         console.log("<-- saveStatus()");
     }
     
-    
-    /**
-     * Returns the card object of the card whose DIV element has given ID.
-     * @param   cardDivName     Name of the cards div element.
-     * @return  The matching Card object or undefined if card was not found.
-     */
-    function getCardObject(cardDivName) {
-        for (var i=0; i < cardsArray.length; ++i) {
-            var card = cardsArray[i];
-            if (card.cardId == cardDivName) {
-                return card;
-            }
-        }
-        return undefined;
-    }
-    
-    /**
-     * Marks the cards as found ones and changes the graphics.
-     * @param   card1           First one of the found cards.
-     * @param   card2           Second one of the found cards.
-     */
-    function matchFound(card1, card2) {
-        card1.found = true;
-        card2.found = true;
-        
-        // Change the graphics to glowing ones.
-        var gfxIndex = card1.cardType;
-        $(card1.cardId).children(".back").css("visibility", "hidden");
-        $(card2.cardId).children(".back").css("visibility", "hidden");
-        $(card1.cardFrontId).css("background", "url("+glowingCardImages[gfxIndex]+")");
-        $(card2.cardFrontId).css("background", "url("+glowingCardImages[gfxIndex]+")");
-    }
-    
     /**
      * Checks the states of the cards and tells if all the pairs have been found.
      * @return  true if all the pairs have been found.
      */
     function allPairsFound() {
-        for (var i=0; i < cardsArray.length; ++i) {
-            var card = cardsArray[i];
-            if (card.found == false) {
-                return false;
-            }
-        }
-        return true;
+        var flipcount = 0;
+        var cardcount = gamedata[levelNumber-1].cardcount;
+        $(".flip").each(function() { flipcount++; });
+        return (flipcount >= cardcount);
     }
     
     
@@ -233,31 +173,34 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
      * A callback function that gets called when card rotation animation ends. This
      * function checks if two rotated cards are pairs.
      */
-    function flipCallback() {
+    function flipCallback(elem) {
         console.log("--> Game.flipCallback()");
-        if (firstFlippedCard == undefined) {
+        var newcard = $(elem).attr("id");
+        if (matchcard == undefined) {
             // This is the first card being turned.
-            firstFlippedCard = clickedCardElement;
-            clickedCardElement = undefined;
+            matchcard = newcard;
             ignoreInputs = false;
-            
         } else {
-            // This is the second card being turned. Check if they are equal.
-            var cardObj1 = getCardObject("#" + firstFlippedCard.attr("id"));
-            var cardObj2 = getCardObject("#" + clickedCardElement.attr("id"));
-            if (cardObj1.cardType == cardObj2.cardType) {
-                matchFound(cardObj1, cardObj2);
+            var newclass = $("#"+newcard+" .front").attr("class");
+            var matchclass = $("#"+matchcard+" .front").attr("class");
+
+            if(newclass == matchclass)
+            {
                 if (allPairsFound()) {
                     gotoNextGame();
                 }
                 ignoreInputs = false;
-                firstFlippedCard = undefined;
-                clickedCardElement = undefined;
-                
             } else {
                 console.log("    no match");
+                $("#"+newcard).removeClass('flip');
+                $("#"+matchcard).removeClass('flip');
+
+                /* keep ignoring input til the cards are flipped back */
                 window.setTimeout("Game.flipDelayCallback()", 300);
             }
+
+            /* reset the match card */
+            matchcard = undefined;
         }
         console.log("<-- Game.flipCallback()");
     }
@@ -267,39 +210,6 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
      */
     function flipDelayCallback() {
         ignoreInputs = false;
-        firstFlippedCard.removeClass(SHOWCARD_STYLE);
-        clickedCardElement.removeClass(SHOWCARD_STYLE);
-        firstFlippedCard = undefined;
-        clickedCardElement = undefined;
-    }
-
-    /**
-     * Shuffles the cards in the beginning of the game.
-     * @param   cardsArray      Array that contains the card objects.
-     */
-    function shuffleLevel(cardsArray) {
-        console.log("--> shuffleLevel1()");
-        // Make an array that contains 2 copies of card type ids.
-        var typeIndexArray = new Array();
-        for (var i=0; i < cardsArray.length; ++i) {
-            typeIndexArray.push( (Math.floor(i / 2)) % normalCardImages.length );
-        }
-        for (var i=0; i < typeIndexArray.length; ++i) {
-            var swapWithIndex = Math.floor(Math.random() * 11);
-            var tmpValue = typeIndexArray[swapWithIndex];
-            typeIndexArray[swapWithIndex] = typeIndexArray[i];
-            typeIndexArray[i] = tmpValue;
-        }
-        var elemIndex = 0;
-        for (var i=0; i < cardsArray.length; ++i) {
-            var gfxIndex = typeIndexArray.pop();
-            var card = cardsArray[i];
-            card.cardType = gfxIndex;
-            console.log("elementId: " + card.cardFrontId + ",    graphics: " + normalCardImages[gfxIndex]);
-            $(card.cardFrontId).css("background", "url("+normalCardImages[gfxIndex]+")");
-            $(card.cardId).removeClass(SHOWCARD_STYLE);
-        }
-        console.log("<-- shuffleLevel1()");
     }
 
     /**
@@ -374,41 +284,29 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         if (resetState) {
             passGames = 0;
         }       
+        levelNumber = levelNum;
+
+	/* reset all the cards */
+	$(".card").removeClass('flip');
 
         // Figure out the amount of cards needed in this level.
-        var cardBgGraphics = "url(images/card_purple.png)"
-        cardsArray = new Array();
-        levelNumber = levelNum;
-        var numOfCards = 12;
-        if (levelNum == 2) {
-            numOfCards = 18;
-            cardBgGraphics = "url(images/card_green.png)"
-        } else if (levelNum == 3) {
-            numOfCards = 24;
-            cardBgGraphics = "url(images/card_red.png)"
-        } else if (levelNum == 4) {
-            numOfCards = 24;
-            cardBgGraphics = "url(images/card_teal.png)"
-        }
-        // Create card objects.
-        for (var i=0; i < numOfCards; ++i) {
-            var card = new Card();
-            card.cardFrontId = "#level"+levelNum+"_card_"+(i+1)+"_front";
-            card.cardId = "#" + $(card.cardFrontId).parent().attr("id");
-            cardsArray.push(card);
+        var types = new Array();
+        var cardcount = gamedata[levelNum-1].cardcount;
+        var cardtypes = gamedata[levelNum-1].cardcount/2;
+        /* create a list of cards by index */
+        for(i = 0; i < cardcount; i++)
+            types.push((i%cardtypes)+1);
 
-            // Manually set toggle the card backgrounds between invisible
-            // background and real card background. We can't use plain css
-            // because the backface-visibility during rotation does not
-            // work in linux Chrome as it should.
-            $(card.cardId).children(".back").css("visibility", "visible");
+        /* randomly fill out the deck */
+        for(i = 0; i < cardcount; i++)
+        {
+            var card_id = "#level"+levelNum+"_card_"+(i+1)+" .front";
+            var target = (Math.random() * types.length)|0;
+            var idx = types.splice(target, 1);
+            var card_class = "front card_type"+idx;
+            $(card_id).attr('class', card_class);
         }
-        setTimeout(function() {shuffleLevel(cardsArray);}, 300);
-        $(".card").removeClass(SHOWCARD_STYLE);
-        firstFlippedCard = undefined;
-        clickedCardElement = undefined;
-        
-        
+
         // Update the hand that holds the game count note.
         var starIconName = stariconsList[levelNum-1];
         for (var gameIndex = 0; gameIndex < 3; ++gameIndex) {
@@ -539,13 +437,12 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
         
         $(".card").bind('touchstart', function() {
             console.log("--> card.touchstart()");
-            if (!ignoreInputs && !($(this).hasClass(SHOWCARD_STYLE))) {
+            if (!ignoreInputs && !($(this).hasClass('flip'))) {
                 playSound(SOUND_FLIPCARD);
-                clickedCardElement = $(this);
                 ignoreInputs = true;
                 console.log("    card id: " + $(this).attr("id"));
-                $(this).addClass(SHOWCARD_STYLE);
-                window.setTimeout("Game.flipCallback()", 350);
+                $(this).addClass('flip');
+                window.setTimeout("Game.flipCallback("+($(this).attr("id"))+")", 350);
             }
             console.log("<-- card.touchstart()");
         });
