@@ -2,7 +2,7 @@
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://github.com/01org/webapps-memory-game-older-kids" version="2.2.0" viewmodes="fullscreen">
     <tizen:application id="E4PRo70Ja6.MemoryGame" package="E4PRo70Ja6" required_version="2.2"/>
     <content src="index.html"/>
-    <icon src="icon_128.png"/>
+    <icon src="icon.png"/>
     <name>memory-game</name>
     <tizen:setting screen-orientation="landscape" context-menu="enable"/>
 </widget>
