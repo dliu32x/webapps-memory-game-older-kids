@@ -75,9 +75,10 @@ var LOCAL_STORAGE_KEY = "memorygame_locked_levels";
      */
     function playSound(soundId) {
         var audioElement = document.getElementById(audioItems[soundId]);
-        audioElement.pause();
-        if (audioElement.currentTime > 0)
-	    audioElement.currentTime = 0;
+        if (audioElement.currentTime > 0) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
         audioElement.play();
     }
 
